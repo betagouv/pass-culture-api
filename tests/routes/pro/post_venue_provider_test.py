@@ -16,12 +16,11 @@ from pcapi.utils.human_ids import dehumanize
 from pcapi.utils.human_ids import humanize
 
 from tests.conftest import TestClient
-from tests.conftest import clean_database
 
 
+@pytest.mark.usefixtures("db_session")
 class Post:
     class Returns201:
-        @pytest.mark.usefixtures("db_session")
         @override_features(SYNCHRONIZE_VENUE_PROVIDER_IN_WORKER=False)
         @patch("pcapi.routes.pro.venue_providers.subprocess.Popen")
         @patch("pcapi.use_cases.connect_venue_to_provider._check_venue_can_be_synchronized_with_provider")
@@ -68,7 +67,6 @@ class Post:
                 ]
             )
 
-        @pytest.mark.usefixtures("db_session")
         @override_features(SYNCHRONIZE_VENUE_PROVIDER_IN_WORKER=True)
         @patch("pcapi.workers.venue_provider_job.venue_provider_job.delay")
         @patch("pcapi.use_cases.connect_venue_to_provider._check_venue_can_be_synchronized_with_provider")
@@ -107,7 +105,6 @@ class Post:
             venue_provider_id = response.json["id"]
             mock_synchronize_venue_provider.assert_called_once_with(dehumanize(venue_provider_id))
 
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         @patch("pcapi.use_cases.connect_venue_to_allocine.get_allocine_theaterId_for_venue")
         def when_add_allocine_stocks_provider_with_price_but_no_isDuo_config(
@@ -138,7 +135,6 @@ class Post:
             venue_provider = VenueProvider.query.one()
             assert json["venueId"] == humanize(venue_provider.venueId)
 
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         def when_add_allocine_stocks_provider_with_default_settings_at_import(self, stubbed_find_by_id, app):
             # Given
@@ -167,7 +163,6 @@ class Post:
             assert response.status_code == 201
 
     class Returns400:
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.routes.pro.venue_providers.check_new_venue_provider_information")
         def when_api_error_raise_from_payload_validation(self, mock_check_new_venue_provider_information, app):
             # Given
@@ -192,7 +187,6 @@ class Post:
             assert response.status_code == 400
             assert ["error received"] == response.json["errors"]
 
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.use_cases.connect_venue_to_provider._check_venue_can_be_synchronized_with_provider")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         def when_trying_to_add_existing_provider(self, stubbed_find_by_id, stubbed_check, app):
@@ -219,7 +213,6 @@ class Post:
             assert response.status_code == 400
             assert response.json["global"] == ["Votre lieu est déjà lié à cette source"]
 
-        @clean_database
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         def when_add_allocine_stocks_provider_with_wrong_format_price(self, stubbed_find_by_id, app):
             # Given
@@ -247,7 +240,6 @@ class Post:
             assert response.json["global"] == ["Le prix doit être un nombre décimal"]
             assert VenueProvider.query.count() == 0
 
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         def when_add_allocine_stocks_provider_with_no_price(self, stubbed_find_by_id, app):
             # Given
@@ -275,7 +267,6 @@ class Post:
             assert VenueProvider.query.count() == 0
 
     class Returns401:
-        @pytest.mark.usefixtures("db_session")
         def when_user_is_not_logged_in(self, app):
             # when
             response = TestClient(app.test_client()).post("/venueProviders")
@@ -284,7 +275,6 @@ class Post:
             assert response.status_code == 401
 
     class Returns404:
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         def when_venue_does_not_exist(self, stubbed_find_by_id, app):
             # Given
@@ -309,7 +299,6 @@ class Post:
             assert response.status_code == 404
 
     class Returns422:
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.use_cases.connect_venue_to_provider._check_venue_can_be_synchronized_with_provider")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         def when_provider_api_not_available(self, stubbed_find_by_id, stubbed_check, app):
@@ -348,7 +337,6 @@ class Post:
             assert VenueProvider.query.count() == 0
 
     class ConnectProviderToVenueTest:
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.use_cases.connect_venue_to_provider._check_venue_can_be_synchronized_with_provider")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
         @patch("pcapi.routes.pro.venue_providers.connect_venue_to_provider")
@@ -378,7 +366,6 @@ class Post:
             # Then
             mocked_connect_venue_to_provider.assert_called_once_with(venue, provider)
 
-        @pytest.mark.usefixtures("db_session")
         @patch("pcapi.use_cases.connect_venue_to_provider._check_venue_can_be_synchronized_with_provider")
         @patch("pcapi.use_cases.connect_venue_to_allocine.get_allocine_theaterId_for_venue")
         @patch("pcapi.routes.pro.venue_providers.find_by_id")
