@@ -349,6 +349,26 @@ class ExpensesTest:
                     Expense(domain=ExpenseDomain.PHYSICAL, current=Decimal(60.0), limit=Decimal(200)),
                 ]
 
+        class MaterielArtCreaTest:
+            def test_offline_offer_increase_physical_expense(self):
+                # Given
+                booking = BookingFactory(
+                    amount=60,
+                    stock__offer__type=str(ThingType.MATERIEL_ART_CREA),
+                    stock__offer__url=None,
+                )
+                user = booking.user
+
+                # when
+                expenses = user.expenses
+
+                # Then
+                assert expenses == [
+                    Expense(domain=ExpenseDomain.ALL, current=Decimal(60.0), limit=Decimal(500)),
+                    Expense(domain=ExpenseDomain.DIGITAL, current=Decimal(0.0), limit=Decimal(200)),
+                    Expense(domain=ExpenseDomain.PHYSICAL, current=Decimal(60.0), limit=Decimal(200)),
+                ]
+
         class JeuxVideoAboTest:
             def test_online_offer_is_capped(self):
                 # Given

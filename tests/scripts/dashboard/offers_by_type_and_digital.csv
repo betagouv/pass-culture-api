@@ -27,3 +27,4 @@ Catégorie,Support,type
 "Spectacle vivant - cartes d'abonnement",Physique,ThingType.SPECTACLE_VIVANT_ABO
 "Vente d'œuvres d'art",Physique,ThingType.OEUVRE_ART
 "Vente et location d’instruments de musique",Physique,ThingType.INSTRUMENT
+"Matériel arts créatifs",Physique,ThingType.MATERIEL_ART_CREA
