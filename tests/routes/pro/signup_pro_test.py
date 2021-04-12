@@ -27,7 +27,7 @@ BASE_DATA_PRO = {
 
 
 @pytest.mark.usefixtures("db_session")
-class Post:
+class PostTest:
     class Returns204:
         def when_user_data_is_valid(self, app):
             # Given

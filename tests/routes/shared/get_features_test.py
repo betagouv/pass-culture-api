@@ -6,7 +6,7 @@ from pcapi.repository import repository
 from tests.conftest import TestClient
 
 
-class Get:
+class GetTest:
     class Returns200:
         @pytest.mark.usefixtures("db_session")
         def when_user_is_logged_in(self, app):

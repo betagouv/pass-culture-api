@@ -13,7 +13,7 @@ from pcapi.repository import repository
 from tests.conftest import TestClient
 
 
-class Patch:
+class PatchTest:
     class Returns204:
         @pytest.mark.usefixtures("db_session")
         def expect_validation_token_to_be_set_to_none_and_email_validated(self, app):

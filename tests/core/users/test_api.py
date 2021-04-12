@@ -187,7 +187,7 @@ class GenerateIdCheckTokenIfEligibleTest:
         assert not token
 
 
-class DeleteExpiredTokens:
+class DeleteExpiredTokensTest:
     def test_deletion(self):
         user = users_factories.UserFactory()
         token_type = TokenType.RESET_PASSWORD

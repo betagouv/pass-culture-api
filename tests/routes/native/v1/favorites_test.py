@@ -21,7 +21,7 @@ pytestmark = pytest.mark.usefixtures("db_session")
 FAVORITES_URL = "/native/v1/me/favorites"
 
 
-class Get:
+class GetTest:
     class Returns200:
         def when_user_is_logged_in_but_has_no_favorites(self, app):
             # Given
@@ -276,7 +276,7 @@ class Get:
             assert response.status_code == 401
 
 
-class Post:
+class PostTest:
     class Returns200:
         def when_user_creates_a_favorite(self, app):
             # Given
@@ -317,7 +317,7 @@ class Post:
             assert Favorite.query.count() == 1
 
 
-class Delete:
+class DeleteTest:
     class Returns204:
         def when_user_delete_its_favorite(self, app):
             # Given

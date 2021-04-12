@@ -13,7 +13,7 @@ from pcapi.utils.human_ids import humanize
 from tests.conftest import TestClient
 
 
-class Delete:
+class DeleteTest:
     class Returns204:
         @pytest.mark.usefixtures("db_session")
         def when_favorite_exists_with_offerId(self, app):

@@ -10,7 +10,7 @@ from pcapi.repository import repository
 from tests.conftest import TestClient
 
 
-class PostNewPassword:
+class PostNewPasswordTest:
     class Returns400:
         @pytest.mark.usefixtures("db_session")
         def when_the_token_is_outdated(self, app):

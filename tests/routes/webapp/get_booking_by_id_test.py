@@ -13,7 +13,7 @@ from pcapi.utils.human_ids import humanize
 from tests.conftest import TestClient
 
 
-class Get:
+class GetTest:
     class Returns200:
         @pytest.mark.usefixtures("db_session")
         def expect_booking_to_have_completed_url(self, app):

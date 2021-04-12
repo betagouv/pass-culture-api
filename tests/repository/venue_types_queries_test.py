@@ -5,7 +5,7 @@ from pcapi.repository import repository
 from pcapi.repository.venue_types_queries import get_all_venue_types
 
 
-class GetAllVenueTypes:
+class GetAllVenueTypesTest:
     @pytest.mark.usefixtures("db_session")
     def test_should_return_the_venue_types(self, app):
         # Given

@@ -11,7 +11,7 @@ from pcapi.utils.human_ids import humanize
 from tests.conftest import TestClient
 
 
-class Post:
+class PostTest:
     class Returns200:
         @pytest.mark.usefixtures("db_session")
         def when_account_is_known(self, app):

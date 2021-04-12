@@ -25,7 +25,7 @@ BASE_DATA = {
 }
 
 
-class Post:
+class PostTest:
     class Returns201:
         @freeze_time("2019-01-01 01:00:00")
         @patch("pcapi.routes.webapp.signup.get_authorized_emails_and_dept_codes")

@@ -7,7 +7,7 @@ from pcapi.workers.mailing_contacts_job import mailing_contacts_job
 from tests.conftest import TestClient
 
 
-class Post:
+class PostTest:
     class Returns201:
         @patch("pcapi.routes.webapp.mailing_contacts.validate_save_mailing_contact_request")
         def when_contact_has_successfully_been_saved(self, validate_request, app):

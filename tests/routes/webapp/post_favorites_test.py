@@ -12,7 +12,7 @@ from pcapi.utils.human_ids import humanize
 from tests.conftest import TestClient
 
 
-class Post:
+class PostTest:
     class Returns400:
         @pytest.mark.usefixtures("db_session")
         def when_offer_id_is_not_received(self, app):

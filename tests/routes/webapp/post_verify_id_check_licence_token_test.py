@@ -10,7 +10,7 @@ token_is_valid_mock = MagicMock()
 token_is_wrong_mock = MagicMock(side_effect=InvalidRecaptchaTokenException())
 
 
-class Post:
+class PostTest:
     class Returns200:
         @patch("pcapi.core.users.repository.get_id_check_token", lambda x: None)
         @patch("pcapi.routes.webapp.beneficiaries.check_webapp_recaptcha_token", token_is_valid_mock)

@@ -3,7 +3,7 @@ from unittest.mock import patch
 from tests.conftest import TestClient
 
 
-class Post:
+class PostTest:
     class Returns200:
         @patch("pcapi.routes.webapp.beneficiaries.beneficiary_job.delay")
         def when_has_exact_payload(self, mocked_beneficiary_job, app):

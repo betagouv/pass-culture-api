@@ -5,7 +5,7 @@ import pytest
 from tests.conftest import TestClient
 
 
-class Post:
+class PostTest:
     class Returns202:
         @patch("pcapi.routes.external.bank_informations.bank_information_job.delay")
         @pytest.mark.usefixtures("db_session")

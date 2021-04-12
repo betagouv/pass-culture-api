@@ -16,7 +16,7 @@ from pcapi.utils.human_ids import humanize
 from tests.conftest import TestClient
 
 
-class Get:
+class GetTest:
     class Returns200:
         @patch("pcapi.routes.webapp.bookings.feature_queries.is_active", return_value=False)
         @pytest.mark.usefixtures("db_session")

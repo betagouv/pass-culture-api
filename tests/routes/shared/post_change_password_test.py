@@ -10,7 +10,7 @@ from pcapi.repository import repository
 from tests.conftest import TestClient
 
 
-class PostChangePassword:
+class PostChangePasswordTest:
     class Returns200:
         @pytest.mark.usefixtures("db_session")
         def when_current_user_changes_password(self, app):

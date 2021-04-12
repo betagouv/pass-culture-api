@@ -15,7 +15,7 @@ from pcapi.repository import repository
 from tests.conftest import TestClient
 
 
-class Get:
+class GetTest:
     class Returns202:
         @pytest.mark.usefixtures("db_session")
         def expect_offerer_to_be_validated(self, app):
