@@ -299,6 +299,18 @@ def _build_bookings_recap_query(user_id: int) -> Query:
     )
 
 
+def _build_bookings_base_query(user_id: int) -> Query:
+    return (
+        Booking.query.join(Stock)
+        .join(Offer)
+        .join(Venue)
+        .join(Offerer)
+        .join(UserOfferer)
+        .filter(UserOfferer.userId == user_id)
+        .filter(UserOfferer.validationToken.is_(None))
+    )
+
+
 def _paginated_bookings_sql_entities_to_bookings_recap(
     paginated_bookings: list[object], page: int, per_page_limit: int, total_bookings_recap: int
 ) -> BookingsRecapPaginated:
