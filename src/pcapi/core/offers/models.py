@@ -332,6 +332,8 @@ class Offer(PcObject, Model, ExtraDataMixin, DeactivableMixin, ProvidableMixin, 
         nullable=True,
     )
 
+    Index("venueId_idAtProvider_index", venueId, idAtProvider)
+
     @hybrid_property
     def isSoldOut(self):
         for stock in self.stocks:
