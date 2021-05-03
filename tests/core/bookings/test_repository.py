@@ -123,8 +123,8 @@ class FindPaymentEligibleBookingsForVenueTest:
 
         # Then
         assert len(bookings) == 2
-        assert bookings[0] == past_event_booking
-        assert bookings[1] == thing_booking
+        assert bookings[0] == thing_booking
+        assert bookings[1] == past_event_booking
         assert future_event_booking not in bookings
 
 
