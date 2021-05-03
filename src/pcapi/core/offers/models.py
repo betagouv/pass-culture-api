@@ -332,7 +332,7 @@ class Offer(PcObject, Model, ExtraDataMixin, DeactivableMixin, ProvidableMixin, 
         nullable=True,
     )
 
-    Index("venueId_idAtProvider_index", venueId, idAtProvider)
+    Index("venueId_idAtProvider_index", venueId, idAtProvider, unique=True)
 
     @hybrid_property
     def isSoldOut(self):
