@@ -334,6 +334,14 @@ class Offer(PcObject, Model, ExtraDataMixin, DeactivableMixin, ProvidableMixin, 
 
     Index("venueId_idAtProvider_index", venueId, idAtProvider, unique=True)
 
+    __table_args__ = (
+        UniqueConstraint(
+            "venueId",
+            "idAtProvider",
+            name="unique_idAtOfferProvider_and_venueId",
+        ),
+    )
+
     @hybrid_property
     def isSoldOut(self):
         for stock in self.stocks:
