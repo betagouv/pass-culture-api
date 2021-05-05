@@ -1,3 +1,7 @@
+import json
+import yaml
+
+import pcapi.core.offers.repository as offers_repository
 from flask import abort
 from flask import flash
 from flask import redirect
@@ -6,12 +10,6 @@ from flask import url_for
 from flask_admin.base import expose
 from flask_admin.form import SecureForm
 from markupsafe import Markup
-from sqlalchemy import func
-from sqlalchemy.orm import query
-from werkzeug import Response
-from wtforms import Form
-from wtforms import SelectField
-
 from pcapi import settings
 from pcapi.admin.base_configuration import BaseAdminView
 from pcapi.connectors import redis
@@ -24,6 +22,14 @@ from pcapi.flask_app import app
 from pcapi.models import Offer
 from pcapi.settings import IS_PROD
 from pcapi.utils.human_ids import humanize
+from sqlalchemy import func
+from sqlalchemy.orm import query
+from werkzeug import Response
+from wtforms import Form
+from wtforms import SelectField
+
+
+# from jinja2 import Markup
 
 
 class OfferView(BaseAdminView):
@@ -211,3 +217,48 @@ class ValidationView(BaseAdminView):
             "offer_name": offer.name,
         }
         return self.render("admin/edit_offer_validation.html", **context)
+
+
+def yaml_formatter(view, context, model, name):
+    value = getattr(model, name)
+    yaml_value = yaml.dump(value, indent=4)  # , ensure_ascii=False, indent=2)
+    return Markup("<pre>{}</pre>".format(yaml_value))
+
+
+class ImportConfigValidationOfferView(BaseAdminView):
+    can_create = True
+    can_edit = False
+    can_delete = False
+    column_list = ["id", "dateCreated", "userId", "user", "specs"]
+    column_sortable_list = ["id", "dateCreated"]
+    column_labels = {
+        "id": "Id",
+        "dateCreated": "Date de création",
+        "userId": "ID Utilisateur",
+        "user": "Utilisateur",
+        "specs": "Configuration",
+    }
+    # column_filters = ["type"]
+    simple_list_pager = True
+    column_default_sort = ("dateCreated", True)
+
+    form_excluded_columns = ("id", "dateCreated", "userId", "user")
+    column_formatters = {
+        "specs": yaml_formatter,
+    }
+
+    def create_form(self):
+        form = super(ImportConfigValidationOfferView, self).create_form()
+        current_config = offers_repository.get_current_offer_validation_config()
+
+        if current_config:
+            form.specs.data = Markup("<pre>{}</pre>".format(yaml.dump(current_config.specs)))
+
+            # yaml.dump(
+        #  if ('variant') in request.args.keys():
+        #      variant_query = self.session.query(Variant).filter(Variant.id = request.args['variant']).one()
+        #      form.variant.query = [variant_query]
+        # if ('size') in request.args.keys():
+        #      size_query = self.session.query(Size).filter(Size.id = request.args['size']).one()
+        #      form.size.query = [size_query]
+        return form
