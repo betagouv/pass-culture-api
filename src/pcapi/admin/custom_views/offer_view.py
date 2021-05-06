@@ -1,15 +1,20 @@
-import json
-import yaml
-
-import pcapi.core.offers.repository as offers_repository
 from flask import abort
 from flask import flash
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask_admin._compat import as_unicode
 from flask_admin.base import expose
 from flask_admin.form import SecureForm
+from flask_admin.form import fields
 from markupsafe import Markup
+from sqlalchemy import func
+from sqlalchemy.orm import query
+from werkzeug import Response
+from wtforms import Form
+from wtforms import SelectField
+import yaml
+
 from pcapi import settings
 from pcapi.admin.base_configuration import BaseAdminView
 from pcapi.connectors import redis
@@ -17,16 +22,12 @@ from pcapi.connectors.api_entreprises import get_offerer_legal_category
 from pcapi.core.offerers.models import Venue
 from pcapi.core.offers.api import update_pending_offer_validation_status
 from pcapi.core.offers.models import OfferValidationStatus
+import pcapi.core.offers.repository as offers_repository
 from pcapi.domain.user_emails import send_offer_validation_status_update_email
 from pcapi.flask_app import app
 from pcapi.models import Offer
 from pcapi.settings import IS_PROD
 from pcapi.utils.human_ids import humanize
-from sqlalchemy import func
-from sqlalchemy.orm import query
-from werkzeug import Response
-from wtforms import Form
-from wtforms import SelectField
 
 
 # from jinja2 import Markup
@@ -225,6 +226,30 @@ def yaml_formatter(view, context, model, name):
     return Markup("<pre>{}</pre>".format(yaml_value))
 
 
+class YAMLField(fields.JSONField):
+    def _value(self):
+        if self.raw_data:
+            return self.raw_data[0]
+        if self.data:
+            # prevent utf8 characters from being converted to ascii
+            return as_unicode((yaml.dump(self.data, indent=4)))
+        return ""
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            value = valuelist[0]
+
+            # allow saving blank field as None
+            if not value:
+                self.data = None
+                return
+
+            try:
+                self.data = valuelist[0]
+            except ValueError:
+                raise ValueError(self.gettext("Invalid YAML"))
+
+
 class ImportConfigValidationOfferView(BaseAdminView):
     can_create = True
     can_edit = False
@@ -246,19 +271,15 @@ class ImportConfigValidationOfferView(BaseAdminView):
     column_formatters = {
         "specs": yaml_formatter,
     }
+    form_overrides = {
+        "specs": YAMLField,
+    }
+    form_widget_args = {"specs": {"rows": 40, "style": "color: black"}}
 
     def create_form(self):
-        form = super(ImportConfigValidationOfferView, self).create_form()
+        form = super().create_form()
         current_config = offers_repository.get_current_offer_validation_config()
 
         if current_config:
-            form.specs.data = Markup("<pre>{}</pre>".format(yaml.dump(current_config.specs)))
-
-            # yaml.dump(
-        #  if ('variant') in request.args.keys():
-        #      variant_query = self.session.query(Variant).filter(Variant.id = request.args['variant']).one()
-        #      form.variant.query = [variant_query]
-        # if ('size') in request.args.keys():
-        #      size_query = self.session.query(Size).filter(Size.id = request.args['size']).one()
-        #      form.size.query = [size_query]
+            form.specs.data = yaml.dump(current_config.specs)
         return form
