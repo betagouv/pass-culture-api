@@ -16,13 +16,13 @@ from pcapi.core.users import constants as users_constants
 from pcapi.core.users import factories as users_factories
 from pcapi.core.users.api import BeneficiaryValidationStep
 from pcapi.core.users.api import _set_offerer_departement_code
-from pcapi.core.users.api import check_and_activate_beneficiary
 from pcapi.core.users.api import create_id_check_token
 from pcapi.core.users.api import delete_expired_tokens
 from pcapi.core.users.api import fulfill_account_password
 from pcapi.core.users.api import fulfill_beneficiary_data
 from pcapi.core.users.api import generate_and_save_token
 from pcapi.core.users.api import get_domains_credit
+from pcapi.core.users.api import has_missing_steps_to_become_beneficiary
 from pcapi.core.users.api import set_pro_tuto_as_seen
 from pcapi.core.users.factories import BeneficiaryImportFactory
 from pcapi.core.users.models import Credit
@@ -392,12 +392,7 @@ class CheckAndActivateUserTest:
         )
         beneficiary_import.setStatus(ImportStatus.CREATED, author=user)
 
-        assert check_and_activate_beneficiary(user) == []
-        assert user.isBeneficiary
-        assert len(user.deposits) == 1
-
-        deposit = user.deposits[0]
-        assert deposit.source == "dossier jouve [0]"
+        assert has_missing_steps_to_become_beneficiary(user) == []
 
     def test_missing_step(self):
         user = self.eligible_user(validate_phone=False)
@@ -405,7 +400,7 @@ class CheckAndActivateUserTest:
         beneficiary_import = BeneficiaryImportFactory(beneficiary=user)
         beneficiary_import.setStatus(ImportStatus.CREATED, author=user)
 
-        assert check_and_activate_beneficiary(user) == [BeneficiaryValidationStep.PHONE_VALIDATION]
+        assert has_missing_steps_to_become_beneficiary(user) == [BeneficiaryValidationStep.PHONE_VALIDATION]
         assert not user.isBeneficiary
 
     def test_rejected_import(self):
@@ -418,7 +413,7 @@ class CheckAndActivateUserTest:
             BeneficiaryValidationStep.PHONE_VALIDATION,
             BeneficiaryValidationStep.ID_CHECK,
         ]
-        assert check_and_activate_beneficiary(user) == expected
+        assert has_missing_steps_to_become_beneficiary(user) == expected
         assert not user.isBeneficiary
 
     def test_missing_all(self):
@@ -428,7 +423,7 @@ class CheckAndActivateUserTest:
             BeneficiaryValidationStep.PHONE_VALIDATION,
             BeneficiaryValidationStep.ID_CHECK,
         ]
-        assert check_and_activate_beneficiary(user) == expected
+        assert has_missing_steps_to_become_beneficiary(user) == expected
         assert not user.isBeneficiary
 
 

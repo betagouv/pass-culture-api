@@ -158,7 +158,7 @@ def create_account(
     return user
 
 
-def check_and_activate_beneficiary(user: User) -> list[BeneficiaryValidationStep]:
+def has_missing_steps_to_become_beneficiary(user: User) -> list[BeneficiaryValidationStep]:
     missing_steps = []
 
     if feature_queries.is_active(FeatureToggle.ENABLE_PHONE_VALIDATION) and not user.is_phone_validated:
@@ -167,11 +167,6 @@ def check_and_activate_beneficiary(user: User) -> list[BeneficiaryValidationStep
     beneficiary_import = get_beneficiary_import_for_beneficiary(user)
     if not beneficiary_import:
         missing_steps.append(BeneficiaryValidationStep.ID_CHECK)
-
-    if not missing_steps:
-        deposit_source = beneficiary_import.get_detailed_source()
-        activate_beneficiary(user, deposit_source)
-        repository.save(user)
 
     return missing_steps
 
@@ -186,16 +181,21 @@ def activate_beneficiary(user: User, deposit_source: str) -> User:
 
 
 def attach_beneficiary_import_details(
-    beneficiary: User, beneficiary_pre_subscription: BeneficiaryPreSubscription
+    beneficiary: User,
+    beneficiary_pre_subscription: BeneficiaryPreSubscription,
+    status: ImportStatus = ImportStatus.CREATED,
 ) -> None:
     beneficiary_import = BeneficiaryImport()
 
     beneficiary_import.applicationId = beneficiary_pre_subscription.application_id
     beneficiary_import.sourceId = beneficiary_pre_subscription.source_id
     beneficiary_import.source = beneficiary_pre_subscription.source
-    beneficiary_import.setStatus(status=ImportStatus.CREATED)
 
-    beneficiary.beneficiaryImports = [beneficiary_import]
+    beneficiary_import.setStatus(status=status)
+    beneficiary_import.beneficiary = beneficiary
+
+    db.session.add(beneficiary_import)
+    db.session.commit()
 
 
 def request_email_confirmation(user: User) -> None:
