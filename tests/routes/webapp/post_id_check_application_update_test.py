@@ -84,6 +84,7 @@ class Post:
             assert beneficiary.postalCode == "35123"
             assert beneficiary.publicName == "Thomas DURAND"
             assert beneficiary.notificationSubscriptions == {"marketing_push": True, "marketing_email": True}
+            assert not users_api.needs_to_validate_phone(user)
 
             deposit = Deposit.query.one()
             assert deposit.amount == 500
@@ -162,6 +163,7 @@ class Post:
             assert user.postalCode == "35123"
             assert user.publicName == "Thomas DURAND"
             assert user.notificationSubscriptions == {"marketing_push": True, "marketing_email": True}
+            assert users_api.needs_to_validate_phone(user)
 
             assert not Deposit.query.one_or_none()
 
